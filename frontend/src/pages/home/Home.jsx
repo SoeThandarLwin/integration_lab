@@ -46,7 +46,7 @@ const Home = () => {
   };
   const handleNoteCreateClose = () => {
     setOpenCreate(false);
-  };image.png
+  };
 
   // Note Edit Modal
   const handleNoteEditOpen = () => {
