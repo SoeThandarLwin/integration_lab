@@ -1,5 +1,7 @@
 import { Box, Link, TextField, Typography } from '@mui/material';
 import React, { useContext, useState } from 'react';
+import Axios from '../../../AxiosInstance';
+import { AxiosError } from 'axios';
 
 const RegisterForm = ({ setIsLogin = () => {}, setStatus = () => {} }) => {
   const [username, setUsername] = useState('');
@@ -11,13 +13,90 @@ const RegisterForm = ({ setIsLogin = () => {}, setStatus = () => {} }) => {
   const [rePassword, setRePassword] = useState('');
   const [rePasswordError, setRePasswordError] = useState('');
 
+  
+  const validateForm=()=>{
+    let isValid=true;
+    // check user
+  
+    if(!username) {
+      setUsernameError('Username is required');
+      isValid=false;
+    }
+    // check email
+  
+    if(!email) {
+      setEmailError('Email is required');
+      isValid=false;
+    }
+  
+    if(!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(email)) {
+      setEmailError('Invalid email format');
+      isValid = false;
+    }
+  
+    // check password
+    if(!password) {
+      setPasswordError('Password is required');
+      isValid=false;
+    }
+  
+    if(!rePassword){
+      setPasswordError('Comfirm password is required');
+    }
+    if(password !== rePassword) {
+      setPasswordError('Password is not match');
+      setPassword('');
+      setPassword('');
+      isValid = false;
+    }
+  
+    return isValid;
+  };
+  
+  
   const handleSubmit = async () => {
     // TODO: Implement login
     // 1. validate form
-    // 2. send request to server
-    // 3. if successful, change modal to login mode
-    // 4. if fail, show error message alert, and reset password fields
+    if(!validateForm()) return;
+
+    try{
+      // 2. send request to server
+      const response = await Axios.post('/register', {
+        username,
+        email,
+        password
+      });
+
+      // 3. if successful, change modal to login mode
+      if(response.data.success) {
+        setIsLogin(true);
+        setStatus({
+          msg: response.data.msg,
+          severity: 'success'
+        });
+      }
+
+    } catch (e) {
+      // 4. if fail, show error message alert, and reset password fields  
+      setPassword('');
+      setRePassword('');
+
+      // check if e are AxiosError
+      if (e instanceof AxiosError)
+        if(e.response)
+          //check if e.response exist
+          return setStatus({
+            msg: e.response.data.error,
+            severity: 'error',
+          });
+          // if e is not AxiosError or response doesn't exist, return error message
+          return setStatus({
+            msg: e.message,
+            severity: 'error',
+          });
+    }    
   };
+  
   return (
     <Box
       sx={{
@@ -106,3 +185,5 @@ const RegisterForm = ({ setIsLogin = () => {}, setStatus = () => {} }) => {
 };
 
 export default RegisterForm;
+
+
