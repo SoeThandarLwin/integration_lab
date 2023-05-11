@@ -64,7 +64,7 @@ const Layout = () => {
           Comment
         </Fab>
         <Container maxWidth="xl">
-          <Narbar handleOpen={handleOpen} />
+          <Narbar handleOpen={handleOpen} user={user} setUser={setUser} />
           <Outlet />
         </Container>
         <AuthModal open={openLoginModal} handleClose={handleClose} setStatus={setStatus} setUser={setUser} />
