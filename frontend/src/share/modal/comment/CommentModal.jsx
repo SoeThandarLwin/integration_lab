@@ -1,13 +1,16 @@
 import { Box, Button, Card, Modal, TextField } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useKeyDown } from '../../../hooks/useKeyDown';
 import CommentCard from './components/CommentCard';
 import Axios from '../../AxiosInstance';
 import Cookies from 'js-cookie';
+import GlobalContext from '../../../share/Context/GlobalContext';
 
 const CommentModal = ({ open = false, handleClose = () => {} }) => {
   const [textField, setTextField] = useState('');
   const [comments, setComments] = useState([]);
+  const {setStatus} = useContext(GlobalContext);
+
 
   useEffect(() => {
     const userToken = Cookies.get('UserToken');
@@ -24,6 +27,7 @@ const CommentModal = ({ open = false, handleClose = () => {} }) => {
         setComments(transformed);
       })
   }, []);
+
 
   useKeyDown(() => {
     handleAddComment();
@@ -43,6 +47,7 @@ const CommentModal = ({ open = false, handleClose = () => {} }) => {
 
     if (response.data.success) {
       setComments([...comments, { id: Math.random(), msg: textField }]);
+      setStatus({msg: textField, severity: 'info'});
     }
   };
 
