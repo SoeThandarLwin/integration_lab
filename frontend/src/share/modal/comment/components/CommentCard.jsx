@@ -4,12 +4,11 @@ import Cookies from 'js-cookie';
 import Axios from '../../../AxiosInstance';
 import GlobalContext from '../../../Context/GlobalContext';
 
-const CommentCard = ({ comment = { id: -1, msg: '' } }) => {
+const CommentCard = ({ comment = { id: -1, msg: '' }, removeComment, updateComment }) => {
   const [isConfirm, setIsConfirm] = useState(false);
   const [functionMode, setFunctionMode] = useState('update');
   const [msg, setMsg] = useState(comment.msg);
   const [id, setId] = useState(comment.id);
-  const [display, setDisplay] = useState('flex');
   const {setStatus} = useContext(GlobalContext);
 
   const submit = useCallback(() => {
@@ -26,7 +25,8 @@ const CommentCard = ({ comment = { id: -1, msg: '' } }) => {
               setStatus({
                 msg: res.data.data.text,
                 severity: 'info',
-              })
+              });
+              updateComment(id, msg);
             }
           });
       } else if (functionMode === 'delete') {
@@ -34,7 +34,7 @@ const CommentCard = ({ comment = { id: -1, msg: '' } }) => {
           .delete('/comment', {headers: { Authorization: `Bearer ${userToken}`}, data: {commentId: id}})
           .then(res => {
             if (res.status === 200) {
-              setDisplay('none');
+              removeComment(id);
             }
           });
       } else {
@@ -44,6 +44,7 @@ const CommentCard = ({ comment = { id: -1, msg: '' } }) => {
           severity: 'error',
         });
       }
+      setIsConfirm(false);
     }
   }, [functionMode, msg]);
 
@@ -58,7 +59,7 @@ const CommentCard = ({ comment = { id: -1, msg: '' } }) => {
   };
 
   return (
-    <Card sx={{ p: '1rem', m: '0.5rem', display, gap: '0.5rem', alignItems: 'center' }}>
+    <Card sx={{ p: '1rem', m: '0.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
       {!(isConfirm && functionMode == 'update') ? (
         <Typography sx={{ flex: 1 }}>{comment.msg}</Typography>
       ) : (

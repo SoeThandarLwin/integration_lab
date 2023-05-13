@@ -11,6 +11,13 @@ const CommentModal = ({ open = false, handleClose = () => {} }) => {
   const [comments, setComments] = useState([]);
   const {setStatus} = useContext(GlobalContext);
 
+  const precisionRemove = (id) => {
+    setComments(comments.filter(c => c.id != id));
+  }
+
+  const precisionUpdate = (id, message) => {
+    setComments(comments.map(c => c.id === id ? {...c, msg: message} : c));
+  }
 
   useEffect(() => {
     const userToken = Cookies.get('UserToken');
@@ -96,7 +103,7 @@ const CommentModal = ({ open = false, handleClose = () => {} }) => {
           }}
         >
           {comments.map((comment) => (
-            <CommentCard comment={comment} key={comment.id} />
+            <CommentCard comment={comment} key={comment.id} removeComment={precisionRemove} updateComment={precisionUpdate} />
           ))}
         </Box>
       </Card>
