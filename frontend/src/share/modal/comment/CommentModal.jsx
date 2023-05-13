@@ -46,8 +46,9 @@ const CommentModal = ({ open = false, handleClose = () => {} }) => {
     });
 
     if (response.data.success) {
-      setComments([...comments, { id: Math.random(), msg: textField }]);
+      setComments([...comments, { id: response.data.data.id, msg: textField }]);
       setStatus({msg: textField, severity: 'info'});
+      setTextField('');
     }
   };
 

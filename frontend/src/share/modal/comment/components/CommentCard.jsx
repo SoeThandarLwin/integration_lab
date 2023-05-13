@@ -1,21 +1,38 @@
 import { Button, Card, TextField, Typography } from '@mui/material';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
+import Cookies from 'js-cookie';
+import Axios from '../../../AxiosInstance';
+import GlobalContext from '../../../Context/GlobalContext';
 
 const CommentCard = ({ comment = { id: -1, msg: '' } }) => {
   const [isConfirm, setIsConfirm] = useState(false);
   const [functionMode, setFunctionMode] = useState('update');
   const [msg, setMsg] = useState(comment.msg);
+  const [id, setId] = useState(comment.id);
+  const [display, setDisplay] = useState('flex');
+  const {setStatus} = useContext(GlobalContext);
 
   const submit = useCallback(() => {
-    if (functionMode === 'update') {
-      // TODO implement update logic
-      console.log('update');
-    } else if (functionMode === 'delete') {
-      // TODO implement delete logic
-      console.log('delete');
-    } else {
-      // TODO setStatus (snackbar) to error
-      console.log('error');
+    const userToken = Cookies.get('UserToken');
+    if (userToken !== undefined && userToken !== 'undefined') {
+      if (functionMode === 'update') {
+        // TODO implement update logic
+        console.log('update');
+      } else if (functionMode === 'delete') {
+        Axios
+          .delete('/comment', {headers: { Authorization: `Bearer ${userToken}`}, data: {commentId: id}})
+          .then(res => {
+            if (res.status === 200) {
+              setDisplay('none');
+            }
+          });
+      } else {
+        // TODO setStatus (snackbar) to error
+        setStatus({
+          msg: `Error! Function Mode ${functionMode} is not recognized!`,
+          severity: 'error',
+        });
+      }
     }
   }, [functionMode]);
 
@@ -30,7 +47,7 @@ const CommentCard = ({ comment = { id: -1, msg: '' } }) => {
   };
 
   return (
-    <Card sx={{ p: '1rem', m: '0.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+    <Card sx={{ p: '1rem', m: '0.5rem', display, gap: '0.5rem', alignItems: 'center' }}>
       {!(isConfirm && functionMode == 'update') ? (
         <Typography sx={{ flex: 1 }}>{comment.msg}</Typography>
       ) : (
