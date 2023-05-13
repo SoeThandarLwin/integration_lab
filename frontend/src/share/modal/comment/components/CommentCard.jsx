@@ -16,8 +16,19 @@ const CommentCard = ({ comment = { id: -1, msg: '' } }) => {
     const userToken = Cookies.get('UserToken');
     if (userToken !== undefined && userToken !== 'undefined') {
       if (functionMode === 'update') {
-        // TODO implement update logic
-        console.log('update');
+        Axios
+          .patch('/comment', {
+            text: msg,
+            commentId: id,
+          }, {headers: {Authorization: `Bearer ${userToken}`}})
+          .then(res => {
+            if (res.status === 200) {
+              setStatus({
+                msg: res.data.data.text,
+                severity: 'info',
+              })
+            }
+          });
       } else if (functionMode === 'delete') {
         Axios
           .delete('/comment', {headers: { Authorization: `Bearer ${userToken}`}, data: {commentId: id}})
@@ -34,7 +45,7 @@ const CommentCard = ({ comment = { id: -1, msg: '' } }) => {
         });
       }
     }
-  }, [functionMode]);
+  }, [functionMode, msg]);
 
   const changeMode = (mode) => {
     setFunctionMode(mode);
